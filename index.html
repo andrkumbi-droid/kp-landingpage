@@ -76,8 +76,11 @@
     .topbar-link svg { color: var(--gold); }
     .topbar-divider { width: 1px; height: 14px; background: rgba(255,255,255,0.1); }
     @media(max-width:768px){
-      .topbar-loc span.full-addr { display: none; }
-      .topbar-loc span.short-addr { display: inline; }
+      .topbar-inner { padding: 0 16px; gap: 10px; justify-content: center; }
+      .topbar-loc { display: none; }
+      .topbar-right { gap: 14px; }
+      .topbar-link { font-size: 0.68rem; }
+      .topbar-divider { display: none; }
     }
     @media(min-width:769px){
       .topbar-loc span.short-addr { display: none; }
