@@ -764,9 +764,9 @@
         063 749 8655
       </a>
       <div class="topbar-divider"></div>
-      <a class="topbar-link" href="mailto:kp.wallpanel@gmail.com">
+      <a class="topbar-link email-link" href="mailto:info@kp-wallpanel.com" data-en-href="mailto:info@kp-wallpanel.com" data-th-href="mailto:kp.wallpanel@gmail.com" data-en="info@kp-wallpanel.com" data-th="kp.wallpanel@gmail.com">
         <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-        kp.wallpanel@gmail.com
+        info@kp-wallpanel.com
       </a>
     </div>
   </div>
@@ -1411,7 +1411,7 @@
           <h4>Contact</h4>
           <ul>
             <li><a href="tel:0637498655">📞 063 749 8655</a></li>
-            <li><a href="mailto:kp.wallpanel@gmail.com">✉ kp.wallpanel@gmail.com</a></li>
+            <li><a class="email-link" href="mailto:info@kp-wallpanel.com" data-en-href="mailto:info@kp-wallpanel.com" data-th-href="mailto:kp.wallpanel@gmail.com" data-en="✉ info@kp-wallpanel.com" data-th="✉ kp.wallpanel@gmail.com">✉ info@kp-wallpanel.com</a></li>
             <li><a href="https://line.me/ti/p/~kp.wallpanel" target="_blank">LINE: kp.wallpanel</a></li>
             <li><a href="https://www.facebook.com/kp.wallpanel" target="_blank">Facebook</a></li>
             <li>
@@ -1461,7 +1461,7 @@
       <div class="footer-copy">© 2026 KP Wallpanel. All rights reserved.</div>
       <div class="footer-copy" style="display:flex;gap:20px;flex-wrap:wrap">
         <a href="tel:0637498655" style="color:rgba(255,255,255,0.18);text-decoration:none;font-size:0.77rem;transition:color 0.2s" onmouseover="this.style.color='#D4AF37'" onmouseout="this.style.color='rgba(255,255,255,0.18)'">063 749 8655</a>
-        <a href="mailto:kp.wallpanel@gmail.com" style="color:rgba(255,255,255,0.18);text-decoration:none;font-size:0.77rem;transition:color 0.2s" onmouseover="this.style.color='#D4AF37'" onmouseout="this.style.color='rgba(255,255,255,0.18)'">kp.wallpanel@gmail.com</a>
+        <a class="email-link" href="mailto:info@kp-wallpanel.com" data-en-href="mailto:info@kp-wallpanel.com" data-th-href="mailto:kp.wallpanel@gmail.com" data-en="info@kp-wallpanel.com" data-th="kp.wallpanel@gmail.com" style="color:rgba(255,255,255,0.18);text-decoration:none;font-size:0.77rem;transition:color 0.2s" onmouseover="this.style.color='#D4AF37'" onmouseout="this.style.color='rgba(255,255,255,0.18)'">info@kp-wallpanel.com</a>
       </div>
     </div>
   </div>
@@ -1530,6 +1530,9 @@ function setLang(lang) {
   document.getElementById('btn-th').classList.toggle('active', lang === 'th');
   document.querySelectorAll('[data-en]').forEach(el => {
     el.innerHTML = el.dataset[lang] || el.dataset.en;
+  });
+  document.querySelectorAll('.email-link').forEach(el => {
+    el.href = el.dataset[lang + 'Href'] || el.dataset.enHref;
   });
   localStorage.setItem('kp-lang', lang);
 }
