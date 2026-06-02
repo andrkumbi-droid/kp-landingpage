@@ -702,69 +702,38 @@
     .reveal.v, .reveal-l.v, .reveal-r.v { opacity:1; transform:none; }
     .d1{transition-delay:.1s} .d2{transition-delay:.2s} .d3{transition-delay:.3s} .d4{transition-delay:.4s}
 
-    /* ─── Quick Actions radial ─── */
+    /* ─── Floating Contact Buttons ─── */
     .qa-wrap {
       position: fixed; bottom: 32px; right: 32px; z-index: 500;
-      width: 52px; height: 52px;
+      display: flex; flex-direction: column; align-items: center; gap: 10px;
     }
-
-    .qa-fab {
-      position: absolute; bottom: 0; right: 0;
-      width: 52px; height: 52px; border-radius: 50%;
-      background: var(--gold); border: none; cursor: pointer;
-      display: flex; align-items: center; justify-content: center;
-      box-shadow: 0 4px 24px rgba(212,175,55,0.4);
-      transition: background 0.25s, box-shadow 0.25s;
-      z-index: 2;
-    }
-    .qa-fab:hover { background: var(--gold-light); box-shadow: 0 6px 32px rgba(212,175,55,0.6); }
-    .qa-fab svg { transition: transform 0.35s cubic-bezier(.34,1.2,.64,1); }
-    .qa-wrap.open .qa-fab svg { transform: rotate(45deg); }
-
     .qa-item {
-      position: absolute; bottom: 4px; right: 4px;
-      width: 46px; height: 46px; border-radius: 50%;
-      background: rgba(12,12,12,0.92);
-      backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
-      border: 1px solid rgba(212,175,55,0.3);
+      width: 52px; height: 52px; border-radius: 50%;
       display: flex; align-items: center; justify-content: center;
-      font-size: 1.25rem; line-height: 1;
       text-decoration: none; cursor: pointer;
-      transform: scale(0) translate(0, 0); opacity: 0;
-      transition: transform 0.35s cubic-bezier(.34,1.56,.64,1),
-                  opacity 0.25s ease,
-                  border-color 0.2s, background 0.2s;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.35);
+      transition: transform 0.2s, box-shadow 0.2s;
+      position: relative;
     }
-    .qa-item:hover { border-color: var(--gold); background: rgba(212,175,55,0.15); }
+    .qa-item:hover { transform: scale(1.1); box-shadow: 0 6px 24px rgba(0,0,0,0.45); }
+    .qa-item.qa-call { background: #1877F2; }
+    .qa-item.qa-line { background: #06C755; }
+    .qa-item.qa-messenger { background: linear-gradient(135deg, #0099FF, #A033FF, #FF0099); }
 
-    /* Orbit positions — quarter circle fan (up + left from FAB) */
-    .qa-wrap.open .qa-item:nth-child(1) {
-      transform: translate(-4px, -130px) scale(1); opacity: 1; transition-delay: 0.04s;
-    }
-    .qa-wrap.open .qa-item:nth-child(2) {
-      transform: translate(-75px, -95px) scale(1); opacity: 1; transition-delay: 0.08s;
-    }
-    .qa-wrap.open .qa-item:nth-child(3) {
-      transform: translate(-105px, -44px) scale(1); opacity: 1; transition-delay: 0.12s;
-    }
-    .qa-wrap.open .qa-item:nth-child(4) {
-      transform: translate(-116px, 10px) scale(1); opacity: 1; transition-delay: 0.16s;
-    }
-
-    /* Tooltip label */
+    /* Tooltip */
     .qa-item::after {
       content: attr(data-label);
       position: absolute; right: calc(100% + 10px); top: 50%; transform: translateY(-50%);
-      background: rgba(10,10,10,0.9); border: 1px solid rgba(212,175,55,0.2);
-      color: rgba(255,255,255,0.85); font-family: 'Noto Sans', sans-serif;
-      font-size: 0.75rem; white-space: nowrap; padding: 5px 10px;
-      opacity: 0; pointer-events: none;
-      transition: opacity 0.18s;
+      background: rgba(10,10,10,0.9); border: 1px solid rgba(255,255,255,0.1);
+      color: rgba(255,255,255,0.9); font-family: 'Noto Sans', sans-serif;
+      font-size: 0.72rem; white-space: nowrap; padding: 5px 10px; border-radius: 4px;
+      opacity: 0; pointer-events: none; transition: opacity 0.18s;
     }
     .qa-item:hover::after { opacity: 1; }
 
     @media(max-width:600px){
-      .qa-wrap { bottom: 20px; right: 16px; }
+      .qa-wrap { bottom: 20px; right: 16px; gap: 8px; }
+      .qa-item { width: 46px; height: 46px; }
     }
 
     @media(max-width:860px){
@@ -810,16 +779,25 @@
 <canvas id="hero-canvas"></canvas>
 
 <!-- ═══════════════════════════ QUICK ACTIONS ═══ -->
-<div class="qa-wrap" id="qa-wrap">
-  <a class="qa-item" href="https://line.me/ti/p/~kp.wallpanel" target="_blank" data-label="Chat on LINE">📱</a>
-  <a class="qa-item" href="tel:0637498655" data-label="Call Now">📞</a>
-  <a class="qa-item" href="mailto:kp.wallpanel@gmail.com?subject=Quotation Request" data-label="Request Quotation">📋</a>
-  <a class="qa-item" href="#" onclick="alert('Catalog coming soon!');return false;" data-label="Download Catalog">📥</a>
-  <button class="qa-fab" id="qa-fab" aria-label="Quick Actions">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5" stroke-linecap="round">
-      <line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>
+<div class="qa-wrap">
+  <!-- Scroll to top -->
+  <a class="qa-item qa-call" href="tel:0637498655" data-label="Call Now" aria-label="Call Now">
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.79 19.79 0 01.18 1.2 2 2 0 012.18 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.91 7.91a16 16 0 006.18 6.18l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/>
     </svg>
-  </button>
+  </a>
+  <!-- LINE -->
+  <a class="qa-item qa-line" href="https://line.me/ti/p/~kp.wallpanel" target="_blank" data-label="Chat on LINE" aria-label="LINE">
+    <svg width="26" height="26" viewBox="0 0 40 40" fill="#fff">
+      <path d="M20 4C11.16 4 4 10.28 4 18c0 5.1 3.06 9.57 7.7 12.17-.34 1.26-1.22 4.56-1.4 5.27-.22.88.32.87.67.63.27-.18 4.35-2.96 6.12-4.16.95.13 1.92.2 2.91.2 8.84 0 16-6.28 16-14S28.84 4 20 4zm-5.5 18.5h-3a1 1 0 01-1-1v-7a1 1 0 012 0v6h2a1 1 0 010 2zm3 0a1 1 0 01-1-1v-7a1 1 0 012 0v7a1 1 0 01-1 1zm8 0h-3a1 1 0 01-1-1v-7a1 1 0 012 0v2.5l2.4-3.2a1 1 0 011.6 1.2l-1.8 2.4 1.9 2.53a1 1 0 01-1.6 1.2L23.5 17v4.5a1 1 0 01-1 1z"/>
+    </svg>
+  </a>
+  <!-- Facebook Messenger -->
+  <a class="qa-item qa-messenger" href="https://m.me/kp.wallpanel" target="_blank" data-label="Messenger" aria-label="Messenger">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="#fff">
+      <path d="M12 2C6.48 2 2 6.2 2 11.4c0 2.85 1.37 5.4 3.52 7.13V22l3.3-1.82c.88.24 1.81.37 2.78.37 5.52 0 10-4.2 10-9.4S17.52 2 12 2zm1.04 12.66l-2.55-2.72-4.97 2.72 5.47-5.8 2.6 2.72 4.93-2.72-5.48 5.8z"/>
+    </svg>
+  </a>
 </div>
 
 <!-- ═══════════════════════════ NAV ═══ -->
@@ -1545,14 +1523,6 @@ const cObs = new IntersectionObserver(es=>{
 },{threshold:.5});
 document.querySelectorAll('.cnt').forEach(el=>cObs.observe(el));
 
-/* ── Quick Actions ── */
-document.getElementById('qa-fab').addEventListener('click', () => {
-  document.getElementById('qa-wrap').classList.toggle('open');
-});
-document.addEventListener('click', e => {
-  if (!document.getElementById('qa-wrap').contains(e.target))
-    document.getElementById('qa-wrap').classList.remove('open');
-});
 
 /* ── Language toggle ── */
 function setLang(lang) {
