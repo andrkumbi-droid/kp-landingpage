@@ -1547,7 +1547,7 @@ document.querySelectorAll('.pf-btn').forEach(btn => {
     btn.classList.add('active');
     const filter = btn.dataset.filter;
     document.querySelectorAll('.prod-card').forEach(card => {
-      const show = filter === 'all' || card.dataset.type === filter;
+      const show = (filter === 'all' || card.dataset.type === filter) && !card.dataset.soldout;
       card.classList.toggle('hidden', !show);
       if(show){
         card.style.animation = 'none';
@@ -1562,6 +1562,86 @@ document.querySelectorAll('.pf-btn').forEach(btn => {
 const sc=document.getElementById('scan'); let sp=0,sd=1;
 function anim(){ sp+=sd*.4; if(sp>100)sd=-1; if(sp<0)sd=1; if(sc)sc.style.top=sp+'%'; requestAnimationFrame(anim); }
 anim();
+</script>
+
+<!-- ── Sold-out sync: hides products marked sold-out in the KP app (same Firebase) ── -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+<script>
+(function(){
+  try {
+    firebase.initializeApp({
+      apiKey: "AIzaSyBhUzwMR28dvulez9q6AZ4gZS80Y9VK0qQ",
+      authDomain: "kp-wallpanel.firebaseapp.com",
+      databaseURL: "https://kp-wallpanel-default-rtdb.asia-southeast1.firebasedatabase.app",
+      projectId: "kp-wallpanel",
+      storageBucket: "kp-wallpanel.firebasestorage.app",
+      messagingSenderId: "794246593779",
+      appId: "1:794246593779:web:703fc0a4ba89ba58734b86"
+    });
+  } catch(e){}
+  var db = firebase.database();
+  var LBL = { all:{en:'All',th:'ทั้งหมด'}, pvc:{en:'PVC Panels',th:'แผ่น PVC'}, wpc:{en:'WPC Panels',th:'แผ่น WPC'} };
+  var IMG_BASE = 'https://andrkumbi-droid.github.io/kp-wallpanel/img/products/';
+  var soldOut = {}, catalog = {};
+  function codeOf(card){ var e=card.querySelector('.prod-code'); return e?e.textContent.trim().toUpperCase():''; }
+  function curLang(){ return localStorage.getItem('kp-lang')||'en'; }
+  function activeFilter(){ var b=document.querySelector('.pf-btn.active'); return b?b.dataset.filter:'all'; }
+  function renderCatalog(){
+    var grid = document.getElementById('prod-grid'); if(!grid) return;
+    // remove previously rendered dynamic cards
+    Array.prototype.forEach.call(grid.querySelectorAll('.prod-card[data-custom="1"]'), function(c){ c.remove(); });
+    // codes already present as hardcoded cards
+    var have = {};
+    grid.querySelectorAll('.prod-card .prod-code').forEach(function(e){ have[e.textContent.trim().toUpperCase()] = 1; });
+    Object.keys(catalog).forEach(function(k){
+      var p = catalog[k]; if(!p || !p.code) return;
+      var mat = (p.mat||'').toUpperCase(); if(mat!=='WPC' && mat!=='PVC') return; // website shows panels only
+      if(have[p.code.toUpperCase()]) return;
+      var type = mat==='PVC' ? 'pvc' : 'wpc';
+      var spec = p.spec || (p.w ? (p.w+' cm') : '');
+      var card = document.createElement('div');
+      card.className = 'prod-card'; card.dataset.type = type; card.dataset.custom = '1';
+      card.innerHTML =
+        '<div class="prod-img-wrap">'+
+          '<img src="'+IMG_BASE+p.code+'.jpg" alt="'+p.code+'" loading="lazy" onerror="this.style.opacity=0.12">'+
+          '<div class="prod-overlay">'+
+            '<span class="prod-tag '+type+'">'+mat+'</span>'+
+            '<div class="prod-code">'+p.code+'</div>'+
+            '<div class="prod-color">'+(p.nameEN||p.name||'')+'</div>'+
+            '<div class="prod-price">฿'+(p.price||0)+' / panel</div>'+
+            '<div class="prod-spec">'+spec+'</div>'+
+          '</div>'+
+        '</div>';
+      grid.appendChild(card);
+    });
+  }
+  function apply(){
+    renderCatalog();
+    var cards = document.querySelectorAll('.prod-card');
+    var cnt = {all:0,pvc:0,wpc:0};
+    cards.forEach(function(card){
+      var out = !!soldOut[codeOf(card)];
+      card.dataset.soldout = out ? '1' : '';
+      if(!out){ cnt.all++; var t=card.dataset.type; if(cnt[t]!=null) cnt[t]++; }
+    });
+    // Update filter-button counts in both languages
+    document.querySelectorAll('.pf-btn').forEach(function(b){
+      var f=b.dataset.filter; if(!LBL[f]) return;
+      b.dataset.en = LBL[f].en+' ('+cnt[f]+')';
+      b.dataset.th = LBL[f].th+' ('+cnt[f]+')';
+      b.innerHTML = b.dataset[curLang()] || b.dataset.en;
+    });
+    // Re-apply the active filter, keeping sold-out hidden
+    var f = activeFilter();
+    cards.forEach(function(card){
+      var show = (f==='all' || card.dataset.type===f) && !card.dataset.soldout;
+      card.classList.toggle('hidden', !show);
+    });
+  }
+  db.ref('soldOut').on('value', function(snap){ soldOut = snap.val()||{}; apply(); });
+  db.ref('catalog').on('value', function(snap){ catalog = snap.val()||{}; apply(); });
+})();
 </script>
 </body>
 </html>
