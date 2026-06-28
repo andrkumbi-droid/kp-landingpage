@@ -1615,6 +1615,12 @@ anim();
         '</div>';
       grid.appendChild(card);
     });
+    // Firebase cards are appended at the end, which would drop new PVC panels
+    // behind the whole WPC block. Re-group so all PVC cards come before all WPC.
+    var ordered = [];
+    grid.querySelectorAll('.prod-card[data-type="pvc"]').forEach(function(c){ ordered.push(c); });
+    grid.querySelectorAll('.prod-card[data-type="wpc"]').forEach(function(c){ ordered.push(c); });
+    ordered.forEach(function(c){ grid.appendChild(c); });
   }
   function apply(){
     renderCatalog();
