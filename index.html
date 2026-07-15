@@ -1583,7 +1583,7 @@ anim();
   var db = firebase.database();
   var LBL = { all:{en:'All',th:'ทั้งหมด'}, pvc:{en:'PVC Panels',th:'แผ่น PVC'}, wpc:{en:'WPC Panels',th:'แผ่น WPC'} };
   var IMG_BASE = 'https://andrkumbi-droid.github.io/kp-wallpanel/img/products/';
-  var soldOut = {}, catalog = {};
+  var soldOut = {}, catalog = {}, webCatalog = {};
   function codeOf(card){ var e=card.querySelector('.prod-code'); return e?e.textContent.trim().toUpperCase():''; }
   function curLang(){ return localStorage.getItem('kp-lang')||'en'; }
   function activeFilter(){ var b=document.querySelector('.pf-btn.active'); return b?b.dataset.filter:'all'; }
@@ -1594,8 +1594,12 @@ anim();
     // codes already present as hardcoded cards
     var have = {};
     grid.querySelectorAll('.prod-card .prod-code').forEach(function(e){ have[e.textContent.trim().toUpperCase()] = 1; });
-    Object.keys(catalog).forEach(function(k){
-      var p = catalog[k]; if(!p || !p.code) return;
+    // Full catalog = webCatalog (complete app catalog) merged with catalog (manual
+    // extras take precedence for richer name/spec). Everything not already a
+    // hardcoded card gets rendered dynamically → the site can never miss a product.
+    var src = {}; Object.keys(webCatalog).forEach(function(k){ src[k]=webCatalog[k]; }); Object.keys(catalog).forEach(function(k){ src[k]=catalog[k]; });
+    Object.keys(src).forEach(function(k){
+      var p = src[k]; if(!p || !p.code) return;
       var mat = (p.mat||'').toUpperCase(); if(mat!=='WPC' && mat!=='PVC') return; // website shows panels only
       if(have[p.code.toUpperCase()]) return;
       var type = mat==='PVC' ? 'pvc' : 'wpc';
@@ -1645,8 +1649,10 @@ anim();
       card.classList.toggle('hidden', !show);
     });
   }
-  db.ref('soldOut').on('value', function(snap){ soldOut = snap.val()||{}; apply(); });
-  db.ref('catalog').on('value', function(snap){ catalog = snap.val()||{}; apply(); });
+  // The app lives under a season prefix (v2/…) and mirrors website data to the
+  // season-independent pub/ path — read that so sold-out + new products always sync.
+  db.ref('pub/soldOut').on('value', function(snap){ soldOut = snap.val()||{}; apply(); });
+  db.ref('pub/webCatalog').on('value', function(snap){ webCatalog = snap.val()||{}; apply(); });
 })();
 </script>
 </body>
