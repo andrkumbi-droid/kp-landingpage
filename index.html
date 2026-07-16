@@ -1629,6 +1629,18 @@ anim();
   function apply(){
     renderCatalog();
     var cards = document.querySelectorAll('.prod-card');
+    // Single image source: every card (curated + dynamic) loads img/products/<CODE>.jpg
+    // from the app repo, so swapping an image there updates the whole site. Falls back
+    // to the card's original image if a per-code file is ever missing.
+    cards.forEach(function(card){
+      var code = codeOf(card); var img = card.querySelector('img');
+      if(!img || !code) return;
+      var want = IMG_BASE + code + '.jpg';
+      if(img.getAttribute('src') === want) return;
+      if(!img.dataset.fallback) img.dataset.fallback = img.getAttribute('src') || '';
+      img.onerror = function(){ if(this.dataset.fallback){ this.onerror=null; this.src=this.dataset.fallback; } };
+      img.src = want;
+    });
     var cnt = {all:0,pvc:0,wpc:0};
     cards.forEach(function(card){
       var out = !!soldOut[codeOf(card)];
