@@ -356,6 +356,16 @@
 
     /* ─────────────────────────── SHARED ─── */
     .container { max-width: 1200px; margin: 0 auto; padding: 0 40px; }
+    /* ── Hero video — link is set from the KP app (Quotation → 🎬 Website Video), stored at Firebase pub/heroVideo ── */
+    .video-section { display: none; background: var(--black); padding: 90px 24px 20px; }
+    .video-section.show { display: block; }
+    .video-inner { max-width: 900px; margin: 0 auto; text-align: center; }
+    .video-eyebrow { font-size: 12px; letter-spacing: .3em; text-transform: uppercase; color: var(--gold); margin-bottom: 26px; }
+    .video-frame { position: relative; border: 1px solid rgba(212,175,55,.28); border-radius: 8px; overflow: hidden; background: var(--black-soft); box-shadow: 0 30px 80px rgba(0,0,0,.55); }
+    .video-frame.ratio-169 { padding-top: 56.25%; }
+    .video-frame.ratio-916 { height: min(78vh, 660px); max-width: 380px; margin: 0 auto; }
+    .video-frame iframe, .video-frame video { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+
     .section { padding: 120px 0; }
     .section-dark { background: var(--black-soft); }
     .section-warm { background: rgba(0,0,0,0.35); }
@@ -888,6 +898,16 @@
   <div class="hero-scroll">
     <div class="scroll-line"></div>
     <span>Scroll</span>
+  </div>
+</section>
+
+<!-- ═══════════════════════════ HERO VIDEO ═══
+     Shown only when a video link exists at Firebase pub/heroVideo —
+     the office sets/updates it in the KP app (Quotation → 🎬 Website Video). -->
+<section class="video-section" id="hero-video">
+  <div class="video-inner">
+    <div class="video-eyebrow" data-en="— Watch Our Latest Clip —" data-th="— คลิปล่าสุดของเรา —">— Watch Our Latest Clip —</div>
+    <div class="video-frame ratio-169" id="hero-video-frame"></div>
   </div>
 </section>
 
@@ -1665,6 +1685,30 @@ anim();
   // season-independent pub/ path — read that so sold-out + new products always sync.
   db.ref('pub/soldOut').on('value', function(snap){ soldOut = snap.val()||{}; apply(); });
   db.ref('pub/webCatalog').on('value', function(snap){ webCatalog = snap.val()||{}; apply(); });
+  // ── Hero video: the app writes {url} to pub/heroVideo; supported links are
+  // YouTube (watch/shorts/youtu.be), TikTok, Facebook and direct .mp4/.webm.
+  db.ref('pub/heroVideo').on('value', function(snap){
+    var sec = document.getElementById('hero-video'), frame = document.getElementById('hero-video-frame');
+    if(!sec || !frame) return;
+    var v = snap.val();
+    var url = (v && v.url ? String(v.url) : '').trim();
+    var html = '', vertical = false, m;
+    if((m = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?(?:.*&)?v=|shorts\/|embed\/))([\w-]{6,})/))){
+      vertical = /\/shorts\//.test(url);
+      html = '<iframe src="https://www.youtube.com/embed/'+m[1]+'?rel=0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
+    } else if((m = url.match(/tiktok\.com\/.*video\/(\d+)/))){
+      vertical = true;
+      html = '<iframe src="https://www.tiktok.com/embed/v2/'+m[1]+'" allow="encrypted-media" allowfullscreen></iframe>';
+    } else if(/facebook\.com|fb\.watch/.test(url)){
+      html = '<iframe src="https://www.facebook.com/plugins/video.php?href='+encodeURIComponent(url)+'&show_text=false" allow="encrypted-media" allowfullscreen scrolling="no"></iframe>';
+    } else if(/\.(mp4|webm|mov)(\?|$)/i.test(url)){
+      html = '<video src="'+url.replace(/"/g,'&quot;')+'" controls playsinline preload="metadata"></video>';
+    }
+    if(!html){ sec.classList.remove('show'); frame.innerHTML = ''; return; }
+    frame.className = 'video-frame ' + (vertical ? 'ratio-916' : 'ratio-169');
+    frame.innerHTML = html;
+    sec.classList.add('show');
+  });
 })();
 </script>
 </body>
