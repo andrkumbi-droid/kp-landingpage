@@ -361,15 +361,16 @@
     .hero-video { display: none; position: absolute; left: clamp(24px, 6vw, 120px); top: 54%; transform: translateY(-50%); z-index: 2; }
     .hero-video.show { display: block; }
     .video-frame { position: relative; border: 1px solid rgba(212,175,55,.28); border-radius: 8px; overflow: hidden; background: var(--black-soft); box-shadow: 0 30px 80px rgba(0,0,0,.55); }
-    .video-frame.ratio-169 { width: min(360px, 26vw); aspect-ratio: 16/9; }
-    .video-frame.ratio-916 { width: min(240px, 17vw); aspect-ratio: 9/16; }
+    /* width is capped by the free space left of the centered 860px hero text (50vw − 430 − margins) */
+    .video-frame.ratio-169 { width: min(420px, calc(50vw - 470px)); aspect-ratio: 16/9; }
+    .video-frame.ratio-916 { width: min(280px, calc(50vw - 470px)); aspect-ratio: 9/16; }
     .video-frame iframe, .video-frame video { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
     @media (max-width: 1279px) {
       .hero { flex-direction: column; }
       .hero-video { position: static; transform: none; margin: 40px auto 0; }
       .hero-video.show { display: flex; justify-content: center; }
-      .video-frame.ratio-916 { width: min(240px, 60vw); }
-      .video-frame.ratio-169 { width: min(440px, 86vw); }
+      .video-frame.ratio-916 { width: min(270px, 64vw); }
+      .video-frame.ratio-169 { width: min(480px, 88vw); }
     }
 
     .section { padding: 120px 0; }
@@ -1693,17 +1694,18 @@ anim();
     var v = snap.val();
     var url = (v && v.url ? String(v.url) : '').trim();
     var html = '', vertical = false, m;
+    // autoplay must be muted or browsers block it
     if((m = url.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?(?:.*&)?v=|shorts\/|embed\/))([\w-]{6,})/))){
       vertical = /\/shorts\//.test(url);
-      html = '<iframe src="https://www.youtube.com/embed/'+m[1]+'?rel=0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
+      html = '<iframe src="https://www.youtube.com/embed/'+m[1]+'?rel=0&autoplay=1&mute=1&loop=1&playlist='+m[1]+'&playsinline=1" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>';
     } else if((m = url.match(/tiktok\.com\/.*video\/(\d+)/))){
       vertical = true;
-      html = '<iframe src="https://www.tiktok.com/embed/v2/'+m[1]+'" allow="encrypted-media" allowfullscreen></iframe>';
+      html = '<iframe src="https://www.tiktok.com/embed/v2/'+m[1]+'?autoplay=1" allow="autoplay; encrypted-media" allowfullscreen></iframe>';
     } else if(/facebook\.com|fb\.watch/.test(url)){
       vertical = /\/reel\/|fb\.watch/.test(url);   // reels are 9:16
-      html = '<iframe src="https://www.facebook.com/plugins/video.php?href='+encodeURIComponent(url)+'&show_text=false" allow="encrypted-media" allowfullscreen scrolling="no"></iframe>';
+      html = '<iframe src="https://www.facebook.com/plugins/video.php?href='+encodeURIComponent(url)+'&show_text=false&autoplay=true" allow="autoplay; encrypted-media" allowfullscreen scrolling="no"></iframe>';
     } else if(/\.(mp4|webm|mov)(\?|$)/i.test(url)){
-      html = '<video src="'+url.replace(/"/g,'&quot;')+'" controls playsinline preload="metadata"></video>';
+      html = '<video src="'+url.replace(/"/g,'&quot;')+'" autoplay muted loop controls playsinline preload="metadata"></video>';
     }
     if(!html){ sec.classList.remove('show'); frame.innerHTML = ''; return; }
     frame.className = 'video-frame ' + (vertical ? 'ratio-916' : 'ratio-169');
