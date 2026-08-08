@@ -356,15 +356,21 @@
 
     /* ─────────────────────────── SHARED ─── */
     .container { max-width: 1200px; margin: 0 auto; padding: 0 40px; }
-    /* ── Hero video — link is set from the KP app (Quotation → 🎬 Website Video), stored at Firebase pub/heroVideo ── */
-    .video-section { display: none; background: var(--black); padding: 64px 24px 20px; }
-    .video-section.show { display: block; }
-    .video-inner { max-width: 680px; margin: 0 auto; text-align: center; }
-    .video-eyebrow { font-size: 12px; letter-spacing: .3em; text-transform: uppercase; color: var(--gold); margin-bottom: 26px; }
+    /* ── Hero video — link is set from the KP app (Management → 🎬 Website Video), stored at Firebase pub/heroVideo.
+       Sits on the left side of the hero on wide screens; drops below the hero text on smaller ones. ── */
+    .hero-video { display: none; position: absolute; left: clamp(24px, 6vw, 120px); top: 54%; transform: translateY(-50%); z-index: 2; }
+    .hero-video.show { display: block; }
     .video-frame { position: relative; border: 1px solid rgba(212,175,55,.28); border-radius: 8px; overflow: hidden; background: var(--black-soft); box-shadow: 0 30px 80px rgba(0,0,0,.55); }
-    .video-frame.ratio-169 { padding-top: 56.25%; }
-    .video-frame.ratio-916 { aspect-ratio: 9/16; max-width: min(280px, 80vw); margin: 0 auto; }
+    .video-frame.ratio-169 { width: min(360px, 26vw); aspect-ratio: 16/9; }
+    .video-frame.ratio-916 { width: min(240px, 17vw); aspect-ratio: 9/16; }
     .video-frame iframe, .video-frame video { position: absolute; inset: 0; width: 100%; height: 100%; border: 0; }
+    @media (max-width: 1279px) {
+      .hero { flex-direction: column; }
+      .hero-video { position: static; transform: none; margin: 40px auto 0; }
+      .hero-video.show { display: flex; justify-content: center; }
+      .video-frame.ratio-916 { width: min(240px, 60vw); }
+      .video-frame.ratio-169 { width: min(440px, 86vw); }
+    }
 
     .section { padding: 120px 0; }
     .section-dark { background: var(--black-soft); }
@@ -895,19 +901,13 @@
       <button class="btn-ghost-w" onclick="document.getElementById('projects').scrollIntoView({behavior:'smooth'})" data-en="Get Inspired" data-th="แรงบันดาลใจ">Get Inspired</button>
     </div>
   </div>
+  <!-- video floats at the hero's left edge on wide screens, drops below the text on narrow ones -->
+  <div class="hero-video" id="hero-video">
+    <div class="video-frame ratio-916" id="hero-video-frame"></div>
+  </div>
   <div class="hero-scroll">
     <div class="scroll-line"></div>
     <span>Scroll</span>
-  </div>
-</section>
-
-<!-- ═══════════════════════════ HERO VIDEO ═══
-     Shown only when a video link exists at Firebase pub/heroVideo —
-     the office sets/updates it in the KP app (Quotation → 🎬 Website Video). -->
-<section class="video-section" id="hero-video">
-  <div class="video-inner">
-    <div class="video-eyebrow" data-en="— Watch Our Latest Clip —" data-th="— คลิปล่าสุดของเรา —">— Watch Our Latest Clip —</div>
-    <div class="video-frame ratio-169" id="hero-video-frame"></div>
   </div>
 </section>
 
